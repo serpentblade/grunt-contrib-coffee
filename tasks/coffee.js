@@ -36,7 +36,13 @@ module.exports = function(grunt) {
         var paths = createOutputPaths(f.dest);
         // add sourceMapDir to options object
         var fileOptions = _.extend({ sourceMapDir: paths.destDir }, options);
-        var writeResult = writeFileAndMap(paths, compileWithMaps(validFiles, fileOptions, paths), fileOptions);
+        var writeResult;
+
+        if(_.isFunction(fileOptions.sourceMapDir)) {
+          // mimic renameTask's rename func
+          fileOptions.sourceMapDir = fileOptions.sourceMapDir(f.orig.dest, path.dirname(f.dest), options);
+        }
+        writeResult = writeFileAndMap(paths, compileWithMaps(validFiles, fileOptions, paths), fileOptions);
         actionCounts.createdFile += writeResult.createdFile;
         actionCounts.createdMap += writeResult.createdMap;
       } else if (options.join === true) {
